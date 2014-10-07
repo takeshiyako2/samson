@@ -4,11 +4,13 @@ Samson::Application.routes.draw do
 
     resources :deploys, only: [:index, :new, :create, :show, :destroy] do
       collection do
-        get :active
+        post :confirm
       end
 
       member do
         get :changeset
+        post :buddy_check
+        post :pending_start
       end
     end
 
@@ -28,18 +30,6 @@ Samson::Application.routes.draw do
     end
 
     resource :changelog, only: [:show]
-
-    resources :deploys, only: [:index, :new, :create, :show, :destroy] do
-      collection do
-        post :confirm
-      end
-
-      member do
-        post :buddy_check
-        post :pending_start
-      end
-
-    end
 
     resources :webhooks, only: [:index, :create, :destroy]
     resource  :commit_statuses, only: [:show]

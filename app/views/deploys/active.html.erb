@@ -1,18 +1,17 @@
 <h1>Current Deploys</h1>
 
-<section>
-  <table class="table">
-    <thead>
+<div class="timeline" ng-controller="CurrentDeploysCtrl">
+  <section class="timeline-content clearfix">
+    <table class="timeline-content">
       <tr>
-        <th>Project</th>
-        <th>Who</th>
-        <th>Status</th>
+        <th>PROJECT</th>
+        <th>USER</th>
+        <th>DEPLOY</th>
+        <th>LAST UPDATE</th>
+        <th>STATUS</th>
         <th></th>
       </tr>
-    </thead>
-    <tbody>
-      <%= render partial: "deploy", collection: @deploys.to_a.compact %>
-    </tbody>
-  </table>
-  <%= paginate @deploys %>
-</section>
+      <%= render partial: "timeline_entry", :locals => {angular_filter: "deploys"} %>
+    </table>
+  </section>
+</div>
