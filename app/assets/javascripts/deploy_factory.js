@@ -126,9 +126,9 @@ samson.filter("localize",
       var localDate = new Date(parseInt(ms));
 
       var day    = DAYS[localDate.getDay()],
-          year   = localDate.getFullYear(),
-          date   = localDate.getDate(),
-          month  = MONTHS[localDate.getMonth()];
+        year   = localDate.getFullYear(),
+        date   = localDate.getDate(),
+        month  = MONTHS[localDate.getMonth()];
 
       return {
         year: year,
@@ -141,7 +141,7 @@ samson.filter("localize",
 );
 
 samson.factory("Deploys",
-  ["$filter", "$http", "$timeout", function($filter, $http, $timeout) {
+  ["$filter", "$window", "$http", "$timeout", function DeploysFactory($filter, $window, $http, $timeout) {
     var localize = $filter("localize");
 
     var Deploys = {
@@ -149,13 +149,21 @@ samson.factory("Deploys",
       page: 1,
       loading: false,
       theEnd: false,
+      modalAlerts: true,
+      url: "/deploys/recent.json",
 
-      loadMore: function() {
-        if (this.theEnd) { return; }
+      jumpTo: function(event) {
+        $window.location.href = A.$(event.currentTarget).data("url");
+      },
 
-        Deploys.loading = true;
+      shortWindow: function() {
+        return !this.theEnd && $window.scrollMaxY === 0;
+      },
 
-        $http.get("/deploys/recent.json", { params: { page: Deploys.page } }).
+      load: function(append) {
+        this.loading = true;
+        if (!append) { this.page = 1; }
+        $http.get(this.url, { params: { page: this.page } }).
           success(function(data) {
             var deploys = data.deploys;
 
@@ -163,56 +171,45 @@ samson.factory("Deploys",
               this.page += 1;
             } else if (deploys.length === 0) {
               this.theEnd = true;
+              if (!append) { this.entries = []; }
               return;
             }
 
             for (var i = 0; i < deploys.length; i++) {
               deploys[i].localized_updated_at = localize(deploys[i].updated_at);
               deploys[i].updated_at_ago = moment(deploys[i].updated_at).fromNow();
-              this.entries.push(deploys[i]);
             }
+            if (append) {
+              this.entries = this.entries.concat(deploys);
+            } else {
+              this.entries = deploys;
+            }
+            console.log("Number of entries: " + this.entries.length);
           }.bind(Deploys)).
           error(function() {
-            alert("Failed to load more entries");
+            this.modalAlerts && alert("Failed to load more entries");
           }).
           finally(function() {
             $timeout(function() { this.loading = false; }.bind(Deploys), 500);
           });
+      },
+
+      loadMore: function() {
+        if (this.theEnd) { return; }
+        this.load(true);
       }
     };
+
+    angular.element($window).on("scroll", (function() {
+      var html = document.querySelector("html");
+      return function() {
+        if ($window.scrollY >= html.scrollHeight - $window.innerHeight - 100 && !Deploys.loading) {
+          console.log("Scrolling window")
+          Deploys.loadMore();
+        }
+      };
+    })());
 
     return Deploys;
   }]
 );
-
-samson.controller("TimelineCtrl", ["$scope", "$window", "$timeout", "Deploys", "StatusFilterMapping",
-function($scope, $window, $timeout, Deploys, StatusFilterMapping) {
-  $scope.userTypes = ["Human", "Robot"];
-  $scope.stageTypes = { "Production": true, "Non-Production": false };
-  $scope.deployStatuses = Object.keys(StatusFilterMapping);
-
-  $scope.jumpTo = function(event) {
-    $window.location.href = A.$(event.currentTarget).data("url");
-  };
-
-  $scope.timelineDeploys = Deploys;
-
-  $scope.timelineDeploys.loadMore();
-
-  angular.element($window).on("scroll", (function() {
-    var html = document.querySelector("html");
-    return function() {
-      if ($window.scrollY >= html.scrollHeight - $window.innerHeight - 100 && !$scope.timelineDeploys.loading) {
-        $scope.$apply($scope.timelineDeploys.loadMore);
-      }
-    };
-  })());
-
-  $timeout(function() {
-    $('select').selectpicker();
-  });
-
-  $scope.shortWindow = function() {
-    return !$scope.timelineDeploys.theEnd && $window.scrollMaxY === 0;
-  };
-}]);

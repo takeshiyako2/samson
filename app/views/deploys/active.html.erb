@@ -1,6 +1,6 @@
 <h1>Current Deploys</h1>
 
-<div class="timeline" ng-controller="CurrentDeploysCtrl">
+<div class="timeline" ng-controller="CurrentDeploysCtrl" >
   <section class="timeline-content clearfix">
     <table class="timeline-content">
       <tr>
@@ -11,7 +11,7 @@
         <th>STATUS</th>
         <th></th>
       </tr>
-      <%= render partial: "timeline_entry", :locals => {angular_filter: "deploys"} %>
+      <%= render partial: "timeline_entry" %>
     </table>
   </section>
 </div>

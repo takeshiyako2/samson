@@ -1,6 +1,6 @@
 <h1>Recent Deploys</h1>
 
-<div class="timeline" ng-controller="TimelineCtrl">
+<div class="timeline" ng-controller="RecentDeploysCtrl">
   <% if @show_filters %>
   <div class="timeline-filters clearfix">
     <div class="timeline-filter col-sm-6">
@@ -37,11 +37,11 @@
         <th>STATUS</th>
         <th></th>
       </tr>
-      <%= render partial: "timeline_entry", :locals => {angular_filter: "(deploys = (timelineDeploys.entries | filter:search | userFilter:userType | stageFilter:stageType | statusFilter:deployStatus))"} %>
+      <%= render partial: "timeline_entry" %>
     </table>
     <%# if there is not enough height for scrolling %>
-    <div ng-if="shortWindow()" class="timeline-show-more">
-      <span class="btn btn-default" ng-click="timelineDeploys.loadMore()">Load More .. {{timelineDeploys.page}}</span>
+    <div ng-if="deploysFactory.shortWindow()" class="timeline-show-more">
+      <span class="btn btn-default" ng-click="deploysFactory.loadMore()">Load More .. {{deploysFactory.page}}</span>
     </div>
   </section>
 </div>
