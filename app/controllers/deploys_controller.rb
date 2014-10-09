@@ -6,7 +6,7 @@ class DeploysController < ApplicationController
 
   before_filter :authorize_deployer!, only: [:new, :create, :confirm, :update, :destroy, :buddy_check, :pending_start]
   before_filter :find_project
-  before_filter :find_deploy, except: [:index, :recent, :active, :new, :create, :confirm]
+  before_filter :find_deploy, except: [:index, :recent, :active, :active_count, :new, :create, :confirm]
 
   def index
     @page = params[:page]
@@ -25,6 +25,15 @@ class DeploysController < ApplicationController
     respond_to do |format|
       format.html
       format.json { render json: @deploys }
+    end
+  end
+
+  def active_count
+    scope = @project ? @project.deploys : Deploy.includes(:stage)
+    hash = { count: scope.active.includes(job: :user).count }
+    Rails.logger.info("Activecount = #{hash.to_s}");
+    respond_to do |format|
+      format.json { render json: hash }
     end
   end
 

@@ -149,7 +149,6 @@ samson.factory("Deploys",
       page: 1,
       loading: false,
       theEnd: false,
-      modalAlerts: true,
       url: "/deploys/recent.json",
 
       jumpTo: function(event) {
@@ -160,12 +159,19 @@ samson.factory("Deploys",
         return !this.theEnd && $window.scrollMaxY === 0;
       },
 
+      getActiveCount: function() {
+        return $http.get('/deploys/active_count.json');
+      },
+
       load: function(append) {
         this.loading = true;
         if (!append) { this.page = 1; }
         $http.get(this.url, { params: { page: this.page } }).
           success(function(data) {
             var deploys = data.deploys;
+
+            // Clear any previous loading errors.
+            A.$('#remoteLoadAlert').remove();
 
             if (deploys && deploys.length) {
               this.page += 1;
@@ -184,10 +190,11 @@ samson.factory("Deploys",
             } else {
               this.entries = deploys;
             }
-            console.log("Number of entries: " + this.entries.length);
           }.bind(Deploys)).
           error(function() {
-            this.modalAlerts && alert("Failed to load more entries");
+            if (!A.$('#remoteLoadAlert').length) {
+              A.$('#alerts').append('<div id="remoteLoadAlert" class="alert alert-warning">Failed to update list from server.</div>');
+            }
           }).
           finally(function() {
             $timeout(function() { this.loading = false; }.bind(Deploys), 500);
@@ -204,7 +211,6 @@ samson.factory("Deploys",
       var html = document.querySelector("html");
       return function() {
         if ($window.scrollY >= html.scrollHeight - $window.innerHeight - 100 && !Deploys.loading) {
-          console.log("Scrolling window")
           Deploys.loadMore();
         }
       };

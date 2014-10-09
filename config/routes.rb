@@ -40,6 +40,7 @@ Samson::Application.routes.draw do
   resources :deploys, only: [] do
     collection do
       get :active
+      get :active_count
       get :recent
     end
   end

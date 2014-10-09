@@ -12,7 +12,9 @@
     <div class="wrap">
       <%= render "shared/header" %>
       <div class="container">
-        <%= render "shared/alerts" %>
+        <div id="alerts">
+          <%= render "shared/alerts" %>
+        </div>
         <%= yield %>
       </div>
     </div>
