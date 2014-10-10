@@ -1,4 +1,3 @@
-
 // This controller updates the badge in the navbar 'Current Deploys'
 samson.controller("CurrentDeployBadgeCtrl", function($scope, $interval, Deploys) {
   $scope.deploysFactory = Deploys;
@@ -22,6 +21,7 @@ samson.controller("CurrentDeployBadgeCtrl", function($scope, $interval, Deploys)
 
   // Refresh the page every X milliseconds
   $interval(function() {
+    console.log("interval called");
     refreshActiveCount();
   }, 5000);
 
@@ -37,6 +37,7 @@ samson.controller("CurrentDeploysCtrl", function($scope, $window, $interval, Dep
 
     // Refresh the page every X milliseconds
     $interval(function() {
+      console.log("interval called");
       $scope.deploysFactory.load();
     }, 5000);
   }

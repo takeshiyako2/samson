@@ -163,9 +163,9 @@ samson.factory("Deploys",
         return $http.get('/deploys/active_count.json');
       },
 
-      load: function(append) {
+      load: function(appendToEntries) {
         this.loading = true;
-        if (!append) { this.page = 1; }
+        if (!appendToEntries) { this.page = 1; }
         $http.get(this.url, { params: { page: this.page } }).
           success(function(data) {
             var deploys = data.deploys;
@@ -177,7 +177,7 @@ samson.factory("Deploys",
               this.page += 1;
             } else if (deploys.length === 0) {
               this.theEnd = true;
-              if (!append) { this.entries = []; }
+              if (!appendToEntries) { this.entries = []; }
               return;
             }
 
@@ -185,7 +185,7 @@ samson.factory("Deploys",
               deploys[i].localized_updated_at = localize(deploys[i].updated_at);
               deploys[i].updated_at_ago = moment(deploys[i].updated_at).fromNow();
             }
-            if (append) {
+            if (appendToEntries) {
               this.entries = this.entries.concat(deploys);
             } else {
               this.entries = deploys;
