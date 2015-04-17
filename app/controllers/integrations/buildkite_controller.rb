@@ -24,4 +24,10 @@ class Integrations::BuildkiteController < Integrations::BaseController
   def branch
     params[:build][:branch]
   end
+
+  private
+
+  def service_type
+    'ci'
+  end
 end
